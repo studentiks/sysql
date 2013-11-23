@@ -1,4 +1,5 @@
 pkgname=sysql-git
+pkgver=20131122
 pkgrel=1
 pkgdesc="sysql - use sql queries against output of linux commands"
 url="https://github.com/studentiks/sysql"
