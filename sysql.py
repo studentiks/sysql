@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import sqlite3, os, sys, re, collections, importlib, datetime, argparse
 
@@ -8,7 +8,11 @@ SEP = '---'
 
 
 def main():
- parser = argparse.ArgumentParser(description='sysql - use sql queries against output of linux commands', prog='sysql', usage='sysql QUERY [-d DATABASE] COMMAND [ARGS] [{SEP} COMMAND_N [ARGS_N] ...]'.format(SEP=SEP))
+ parser = argparse.ArgumentParser(
+    description='sysql - use sql queries against output of linux commands'
+  , prog='sysql'
+  , usage='sysql [-q QUERY] [-d DATABASE] COMMAND [ARGS] [{SEP} COMMAND_N [ARGS_N] ...]'.format(SEP=SEP)
+ )
 
  default_query = 'SELECT * FROM {command}'
  default_database = ':memory:'
@@ -16,6 +20,9 @@ def main():
  parser.add_argument('-d', '--database', default=default_database, type=str)
  parser.add_argument('commands', nargs=argparse.REMAINDER)
  args = parser.parse_args()
+ if len(sys.argv) == 1:
+  parser.print_help()
+  sys.exit()
 
  db = sqlite3.connect(args.database, detect_types=sqlite3.PARSE_DECLTYPES)
 
@@ -85,3 +92,4 @@ def print_table(rows, headers):
 
 if __name__ == '__main__':
  main()
+ 
