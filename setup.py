@@ -15,5 +15,5 @@ setup(
  , url="https://github.com/studentiks/sysql"
  , long_description=read("README.md")
  , packages = ['commands']
- , scripts=["sysql"]
+ , scripts=["sysql.py"]
 )
