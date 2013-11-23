@@ -1,32 +1,26 @@
-pkgname=sysql
-pkgver=0.1
+pkgname=sysql-git
 pkgrel=1
-pkgdesc="Use sql queries against output of linux commands"
-url=""
+pkgdesc="sysql - use sql queries against output of linux commands"
+url="https://github.com/studentiks/sysql"
 arch=('x86_64' 'i686')
-license=('GPLv3')
-depends=('python3')
+license=('MIT')
+depends=('python')
 optdepends=()
-makedepends=()
+makedepends=('git' 'python-setuptools')
 conflicts=()
 replaces=()
 backup=()
-install='sysql.install'
-source=("http://www.server.tld/${pkgname}-${pkgver}.tar.gz"
-        "foo.desktop")
-md5sums=('a0afa52d60cea6c0363a2a8cb39a4095'
-         'a0afa52d60cea6c0363a2a8cb39a4095')
+source=("${pkgname}::git+https://github.com/studentiks/sysql.git")
+md5sums=('SKIP')
 
-build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  cmake ./ -DCMAKE_INSTALL_PREFIX=/usr
-  make
+pkgver() {
+        cd ${pkgname}
+        git describe --always | sed 's|-|.|g'
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+ cd "${srcdir}/${pkgname}"
+ python setup.py install --root=${pkgdir}
+ ln -s /usr/bin/sysql ${pkgdir}/usr/bin/sysql.py
+ install -D -m644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }
-
-# vim:set ts=2 sw=2 et:
