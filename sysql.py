@@ -1,0 +1,87 @@
+#!/usr/bin/python
+
+import sqlite3, os, sys, re, collections, importlib, datetime, argparse
+
+import commands
+VALID_COMMANDS = [fn for fn, ext in map(os.path.splitext, os.listdir(commands.__path__[0])) if ext == '.py' and not fn.startswith('_')]
+SEP = '---'
+
+
+def main():
+ parser = argparse.ArgumentParser(description='sysql - use sql queries against output of linux commands', prog='sysql', usage='sysql QUERY [-d DATABASE] COMMAND [ARGS] [{SEP} COMMAND_N [ARGS_N] ...]'.format(SEP=SEP))
+
+ default_query = 'SELECT * FROM {command}'
+ default_database = ':memory:'
+ parser.add_argument('-q','--query', default=default_query, type=str)
+ parser.add_argument('-d', '--database', default=default_database, type=str)
+ parser.add_argument('commands', nargs=argparse.REMAINDER)
+ args = parser.parse_args()
+
+ db = sqlite3.connect(args.database, detect_types=sqlite3.PARSE_DECLTYPES)
+
+ def split_list(inlist, separator):
+  outlist = []
+  for el in inlist + [separator]:
+   if el == separator:
+    yield outlist
+    outlist = []
+   else:
+    outlist.append(el)
+
+ commands_args = []
+ for command in split_list(args.commands, SEP):
+  if not command: raise Exception('Command expected')
+  cmd, cmd_args = command[0], command[1:]
+  commands_args.append((cmd, cmd_args))
+  if cmd not in VALID_COMMANDS: raise Exception('Invalid command: {}'.format())
+
+ for cmd, cmd_args in commands_args:
+  run = importlib.import_module('commands.{}'.format(cmd)).run
+  run(cmd_args, db)
+
+ sql = args.query
+ if sql == default_query: sql = default_query.format(command=commands_args[0][0])
+
+ rows = []
+ headers = []
+
+ cur = db.cursor()
+ cur.execute(sql)
+ headers = [t[0] for t in cur.description]
+ rows = [list(row) for row in cur]
+
+ print(print_table(rows, headers))
+
+
+def print_table(rows, headers):
+ res = ""
+ sep = "|"
+ maxlen = [0] * (len(headers or rows[0]))
+ for i, row in enumerate(rows):
+  for j, item in enumerate(row):
+   maxlen[j] = max(maxlen[j], len(str(item)))
+
+  for j, item in enumerate(headers):
+   maxlen[j] = max(maxlen[j], len(str(item)))
+  line = sep.join("{: <" + str(maxlen[i]) + "}" for i, v in enumerate(headers))
+
+ res += line.format(*headers) + '\n'
+
+ def align(v):
+  if type(v) in (int, float, complex, datetime.datetime, datetime.timedelta):
+   return ">"
+  else:
+   return "<"
+
+ lines = []
+ for row in rows:
+  line = sep.join(["{: " + align(v) + str(maxlen[i]) + "}" for i, v in enumerate(row)])
+  lines.append(line.format(*map(str, row)))
+
+ if lines: res += '\n'.join(lines) + '\n'
+
+ return res
+
+
+if __name__ == '__main__':
+ main()
