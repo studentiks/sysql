@@ -1,4 +1,5 @@
 pkgname=sysql-git
+pkgver=4b549a9
 pkgrel=1
 pkgdesc="sysql - use sql queries against output of linux commands"
 url="https://github.com/studentiks/sysql"
@@ -21,6 +22,5 @@ pkgver() {
 package() {
  cd "${srcdir}/${pkgname}"
  python setup.py install --root=${pkgdir}
- ln -s /usr/bin/sysql ${pkgdir}/usr/bin/sysql.py
  install -D -m644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
 }
