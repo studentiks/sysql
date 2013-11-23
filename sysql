@@ -22,6 +22,9 @@ def main():
  args = parser.parse_args()
  if len(sys.argv) == 1:
   parser.print_help()
+  print('\nVALID COMMANDS:')
+  for cmd in VALID_COMMANDS:
+   print(cmd)
   sys.exit()
 
  db = sqlite3.connect(args.database, detect_types=sqlite3.PARSE_DECLTYPES)
