@@ -8,6 +8,7 @@ def run(args, db):
  out_structure = \
  """COMMAND   command          text
     PID       pid              int
+    TID       tid              int
     USER      user             text
     FD        file_descriptor  text
     TYPE      type             text
@@ -26,6 +27,7 @@ def run(args, db):
   columns.append(Column(out=out, field=field, type=type))
 
  args.append('-b')
+ args.append('-w')
 
  bout = subprocess.check_output([cmd] + args)
  out_lines = bout.decode(errors='surrogate').split('\n')
@@ -43,6 +45,10 @@ def run(args, db):
  # removing irrelevant stars
  header = re.sub('\*(\s+\*)', lambda mo: ' ' + mo.group(1), header)
  headers = header.split('*')
+
+ # -i attribute removes TID column
+ if header.find('TID') == -1:
+  columns.remove(next(filter(lambda col: col.out == 'TID', columns)))
 
  assert len(headers) == len(columns), 'parsed header has {} columns instead of {}'.format(len(headers),len(columns))
 

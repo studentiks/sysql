@@ -16,7 +16,7 @@ def main():
 
  default_query = 'SELECT * FROM {command}'
  default_database = ':memory:'
- parser.add_argument('-q','--query', default=default_query, type=str)
+ parser.add_argument('-q', '--query', default=default_query, type=str)
  parser.add_argument('-d', '--database', default=default_database, type=str)
  parser.add_argument('commands', nargs=argparse.REMAINDER)
  args = parser.parse_args()
@@ -30,6 +30,7 @@ def main():
  db = sqlite3.connect(args.database, detect_types=sqlite3.PARSE_DECLTYPES)
 
  def split_list(inlist, separator):
+  if not inlist: raise StopIteration()
   outlist = []
   for el in inlist + [separator]:
    if el == separator:
@@ -43,7 +44,7 @@ def main():
   if not command: raise Exception('Command expected')
   cmd, cmd_args = command[0], command[1:]
   commands_args.append((cmd, cmd_args))
-  if cmd not in VALID_COMMANDS: raise Exception('Invalid command: {}'.format())
+  if cmd not in VALID_COMMANDS: raise Exception('Invalid command')
 
  for cmd, cmd_args in commands_args:
   run = importlib.import_module('commands.{}'.format(cmd)).run
@@ -95,4 +96,3 @@ def print_table(rows, headers):
 
 if __name__ == '__main__':
  main()
- 
