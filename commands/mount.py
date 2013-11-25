@@ -25,7 +25,6 @@ def run(args, db):
  for line in out_lines:
   m = re.match(r'^(.*)\son\s(.*)\stype\s(.*)\s\((.*)\)$', line)
   vals = m.groups()
-  print(vals)
   assert len(vals) == len(columns), 'parsed line has {} matches instead of {}'.format(len(vals), len(columns))
 
   q_marks = ','.join('?' * len(vals))

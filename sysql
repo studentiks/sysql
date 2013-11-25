@@ -23,7 +23,8 @@ def main():
  if len(sys.argv) == 1:
   parser.print_help()
   print('\nVALID COMMANDS:')
-  for cmd in VALID_COMMANDS:
+
+  for cmd in sorted(VALID_COMMANDS):
    print(cmd)
   sys.exit()
 
