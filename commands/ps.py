@@ -2,6 +2,9 @@ import io, subprocess, sqlite3, collections, datetime, re, sys
 
 
 def run(args, db):
+ cmd = 'ps'
+ table = 'ps'
+
  out_structure = \
  """pid  tname    time      etime        %cpu      sgi_p     uname     comm    args
     10   10       20        20           10        10        100       20      100500
@@ -48,13 +51,12 @@ def run(args, db):
   sqlite3.register_adapter(c, c.adapter)
   sqlite3.register_converter(c.__name__, c.converter)
 
-
  args.extend(['-o', ','.join(['{}:{}'.format(col.out, col.size) for col in columns])])
- bout = subprocess.check_output(['ps'] + args)
+ bout = subprocess.check_output([cmd] + args)
  out = io.StringIO(bout.decode(errors='surrogate'))
  out.readline()
 
- sql = 'CREATE TABLE ps ({columns})'.format(columns=','.join(['{} {}'.format(col.name, col.type) for col in columns]))
+ sql = 'CREATE TABLE {table} ({columns})'.format(table=table, columns=','.join(['{} {}'.format(col.name, col.type) for col in columns]))
  db.execute(sql)
 
  left = 0
@@ -67,4 +69,4 @@ def run(args, db):
  for line in out:
   vals = [line[start:end].strip() for start, end in header]
   vals = [type_map[t](v) for t, v in zip(ps_types, vals)]
-  db.execute('INSERT INTO ps VALUES ({q})'.format(q=','.join('?'*len(ps_names))), tuple(vals))
+  db.execute('INSERT INTO {table} VALUES ({q})'.format(table=table,q=','.join('?'*len(ps_names))), tuple(vals))

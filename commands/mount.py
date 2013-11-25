@@ -2,7 +2,9 @@ import io, subprocess, sqlite3, collections, datetime, re, sys, operator
 
 
 def run(args, db):
+ cmd = 'mount'
  table = 'mount'
+
  out_structure = 'device mountpoint type options'.split()
 
  class Column:
@@ -14,7 +16,7 @@ def run(args, db):
  for field in out_structure:
   columns.append(Column(field=field, type='text'))
 
- bout = subprocess.check_output(['/usr/bin/mount'] + args)
+ bout = subprocess.check_output([cmd] + args)
  out_lines = bout.decode(errors='surrogate').split('\n')
  out_lines.pop()
 

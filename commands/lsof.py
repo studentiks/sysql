@@ -3,7 +3,7 @@ import io, subprocess, sqlite3, collections, datetime, re, sys, operator
 
 def run(args, db):
  cmd = 'lsof'
- table_name = cmd
+ table = 'lsof'
 
  out_structure = \
  """COMMAND   command          text
@@ -56,7 +56,7 @@ def run(args, db):
  # print(header)
  # print('\n'.join(out_lines))
 
- sql = 'CREATE TABLE {table} ({columns})'.format(table=table_name, columns=','.join(['{} {}'.format(col.field, col.type) for col in columns]))
+ sql = 'CREATE TABLE {table} ({columns})'.format(table=table, columns=','.join(['{} {}'.format(col.field, col.type) for col in columns]))
  db.execute(sql)
  for line in out_lines:
   h_start = 0
@@ -69,5 +69,5 @@ def run(args, db):
    h_start = h_end + 1
    h_end = h_start
   q_marks = ','.join('?' * len(vals))
-  db.execute('INSERT INTO {table} VALUES ({q})'.format(table=table_name,q=q_marks), tuple(vals))
+  db.execute('INSERT INTO {table} VALUES ({q})'.format(table=table, q=q_marks), tuple(vals))
 

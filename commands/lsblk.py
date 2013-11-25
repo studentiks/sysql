@@ -2,6 +2,8 @@ import io, subprocess, sqlite3, collections, datetime, re, sys, operator
 
 
 def run(args, db):
+ cmd = 'lsblk'
+ table = 'lsblk'
  out_structure = \
  """KNAME       device                    text
     MAJ:MIN     device_number             text
@@ -33,7 +35,7 @@ def run(args, db):
  args.extend(['-o', ','.join([col.out for col in columns])])
  args.append('-b')
 
- bout = subprocess.check_output(['/usr/bin/lsblk'] + args)
+ bout = subprocess.check_output([cmd] + args)
  out_lines = bout.decode(errors='surrogate').split('\n')
  out_lines.pop()
 
@@ -52,11 +54,7 @@ def run(args, db):
 
  assert len(headers) == len(columns), 'parsed header has {} columns instead of {}'.format(len(headers),len(columns))
 
- # print('lsblk ' + ' '.join(args))
- # print(header)
- # print('\n'.join(out_lines))
-
- sql = 'CREATE TABLE lsblk ({columns})'.format(columns=','.join(['{} {}'.format(col.field, col.type) for col in columns]))
+ sql = 'CREATE TABLE {table} ({columns})'.format(table=table, columns=','.join(['{} {}'.format(col.field, col.type) for col in columns]))
  db.execute(sql)
  for line in out_lines:
   h_start = 0
@@ -69,5 +67,5 @@ def run(args, db):
    h_start = h_end + 1
    h_end = h_start
   q_marks = ','.join('?' * len(vals))
-  db.execute('INSERT INTO lsblk VALUES ({q})'.format(q=q_marks), tuple(vals))
+  db.execute('INSERT INTO {table} VALUES ({q})'.format(table=table, q=q_marks), tuple(vals))
 

@@ -2,7 +2,9 @@ import io, subprocess, sqlite3, collections, datetime, re, sys, operator
 
 
 def run(args, db):
+ cmd = 'ls'
  table = 'ls'
+
  args.append('-i')
  args.append('-lU')
  args.append('-Q')
@@ -10,7 +12,7 @@ def run(args, db):
  args.append('--indicator-style=classify')
  out_structure = """[index] permissions num [user] [group] size time_mod  filename refers_to type
                     int     text        int text   text    int  time_mod  text     text      text""".split('\n')
- sqlite3.enable_callback_tracebacks(True)
+
  class Column:
   def __init__(s, **kwargs):
    for k, v in kwargs.items():
@@ -30,7 +32,7 @@ def run(args, db):
 
  sqlite3.register_converter('time_mod', time_mod_converter)
 
- bout = subprocess.check_output(['/usr/bin/ls'] + args)
+ bout = subprocess.check_output([cmd] + args)
  out_lines = bout.decode(errors='surrogate').split('\n')
  out_lines.pop(0)
  out_lines.pop()
