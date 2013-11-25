@@ -74,8 +74,8 @@ def print_table(rows, headers):
 
   for j, item in enumerate(headers):
    maxlen[j] = max(maxlen[j], len(str(item)))
-  line = sep.join("{: <" + str(maxlen[i]) + "}" for i, v in enumerate(headers))
 
+ line = sep.join("{: <" + str(maxlen[i]) + "}" for i, v in enumerate(headers))
  res += line.format(*headers) + '\n'
 
  def align(v):
